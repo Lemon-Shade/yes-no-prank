@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Question 💜</title>
+<style>
+* { box-sizing: border-box; }
 
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: linear-gradient(135deg, #180b2e, #54218a, #a855f7);
+  overflow: hidden;
+}
+
+.card {
+  width: min(90%, 430px);
+  padding: 35px 22px;
+  text-align: center;
+  border: 1px solid #ffffff40;
+  border-radius: 25px;
+  background: #ffffff16;
+  box-shadow: 0 15px 50px #0005;
+  backdrop-filter: blur(12px);
+}
+
+.heart { font-size: 55px; }
+
+h1 { font-size: 28px; margin: 15px 0; }
+
+p { color: #f0ddff; line-height: 1.6; }
+
+.buttons {
+  position: relative;
+  min-height: 100px;
+  margin-top: 25px;
+}
+
+button {
+  border: 0;
+  border-radius: 30px;
+  padding: 14px 27px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#yes {
+  color: #54218a;
+  background: #fff;
+  transition: left .2s, top .2s, opacity .4s, transform .2s;
+}
+
+#no {
+  color: white;
+  background: #9b55d4;
+  border: 1px solid #ffffff70;
+  margin-left: 10px;
+}
+
+#message { font-size: 22px; font-weight: bold; }
+
+.hidden { display: none; }
+
+#yes.vanished {
+  opacity: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<main class="card">
+  <div class="heart">💜</div>
+  <h1 id="heading">Will you forgive me?</h1>
+  <p id="description">
+    Be honest... there's only one correct answer 😭
+  </p>
+
+  <div class="buttons" id="buttonArea">
+    <button id="yes">YES 💖</button>
+    <button id="no">NO 😈</button>
+  </div>
+
+  <p id="message" class="hidden"></p>
+  <button id="restart" class="hidden">Try again ↻</button>
+</main>
+
+<script>
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const area = document.getElementById("buttonArea");
+const heading = document.getElementById("heading");
+const description = document.getElementById("description");
+const message = document.getElementById("message");
+const restart = document.getElementById("restart");
+
+let attempts = 0;
+let moved = false;
+
+function dodge(event) {
+  if (event) event.preventDefault();
+  if (yes.classList.contains("vanished")) return;
+
+  attempts++;
+
+  if (attempts >= 7) {
+    yes.classList.add("vanished");
+    description.textContent = "Well... looks like YES has left the chat 💨";
+    return;
+  }
+
+  const maxX = Math.max(0, area.clientWidth - yes.offsetWidth);
+  const maxY = 65;
+
+  yes.style.position = "absolute";
+  yes.style.left = Math.random() * maxX + "px";
+  yes.style.top = Math.random() * maxY + "px";
+  yes.style.transform = "scale(" + Math.max(.45, 1 - attempts * .08) + ")";
+
+  if (!moved) {
+    no.style.position = "absolute";
+    no.style.right = "0";
+    no.style.bottom = "0";
+    moved = true;
+  }
+
+  description.textContent = [
+    "Try catching it 😂",
+    "Nope, too slow 😭",
+    "It's getting scared 💨",
+    "Almost gone... 👀",
+    "You really want YES that badly? 💀",
+    "One more try... 😂"
+  ][Math.min(attempts - 1, 5)];
+}
+
+yes.addEventListener("pointerenter", function(event) {
+  if (event.pointerType === "mouse") dodge(event);
+});
+
+yes.addEventListener("click", dodge);
+
+no.addEventListener("click", function() {
+  yes.classList.add("hidden");
+  no.classList.add("hidden");
+  heading.textContent = "YOU CHOSE NO?! 😭";
+  description.textContent = "I can't believe this...";
+  message.textContent = "PRANKED! 😂💜";
+  message.classList.remove("hidden");
+  restart.classList.remove("hidden");
+});
+
+restart.addEventListener("click", function() {
+  attempts = 0;
+  moved = false;
+  yes.className = "";
+  yes.removeAttribute("style");
+  no.className = "";
+  no.removeAttribute("style");
+  yes.classList.remove("hidden");
+  no.classList.remove("hidden");
+  message.classList.add("hidden");
+  restart.classList.add("hidden");
+  heading.textContent = "Will you forgive me?";
+  description.textContent = "Be honest... there's only one correct answer 😭";
+});
+
+</script>
+</body>
+</html>
