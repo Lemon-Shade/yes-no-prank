@@ -3,474 +3,262 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Little Quiz 💜</title>
+<title>Little Quiz 💜</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   padding: 18px;
   font-family: Arial, sans-serif;
   color: white;
-  background: linear-gradient(135deg, #250044, #7415a8, #d16aff);
+  background: linear-gradient(135deg, #230046, #8126a8, #d45cba);
 }
 
 .card {
   width: 100%;
-  max-width: 460px;
-  min-height: 350px;
-  padding: 30px 22px;
+  max-width: 430px;
+  padding: 28px 20px;
   text-align: center;
-  background: rgba(35, 0, 55, 0.88);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 25px;
-  box-shadow: 0 15px 45px rgba(0,0,0,0.3);
-  overflow: hidden;
+  background: rgba(25, 0, 40, .65);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 24px;
+  box-shadow: 0 12px 35px #21002b66;
 }
 
-h1 {
-  font-size: 27px;
-  line-height: 1.3;
-}
-
-p {
-  line-height: 1.6;
-  color: #f0d9ff;
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 25px;
-  min-height: 65px;
-}
+h1 { font-size: 27px; }
+p { line-height: 1.5; }
 
 button {
-  border: none;
-  border-radius: 14px;
-  padding: 14px 22px;
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 22px;
+  margin: 8px 5px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  color: #4b1268;
-  background: white;
   touch-action: manipulation;
-  user-select: none;
 }
 
-button:hover {
-  background: #f4dcff;
-}
-
-button:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid #ffdc67;
-  outline-offset: 3px;
+.choice {
+  background: #f5d8ff;
+  color: #4c1766;
 }
 
 .primary {
-  background: #e6a6ff;
-  color: #35004d;
+  background: #ff8bd8;
+  color: #381044;
 }
 
-#heightArea {
+#playArea {
   position: relative;
-  min-height: 120px;
-  margin-top: 20px;
+  min-height: 155px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 14px;
 }
 
-#heightArea button {
+.dodge {
   position: absolute;
-  top: 20px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
 }
 
-#tallBtn {
-  left: 12%;
-}
-
-#shortBtn {
-  right: 12%;
-}
-
-#loveArea {
-  position: relative;
-  height: 150px;
-  margin-top: 20px;
-}
-
-#loveArea button {
-  position: absolute;
-  top: 35px;
-  transition: left 0.12s, top 0.12s;
-}
-
-#yesBtn {
-  left: 10%;
-}
-
-#noBtn {
-  left: 58%;
-}
-
-textarea {
+#secret {
   width: 100%;
   min-height: 100px;
-  padding: 13px;
-  margin: 14px 0;
-  border: 2px solid #dca6f5;
+  padding: 12px;
   border-radius: 12px;
+  border: 2px solid #e8b8ff;
   font: inherit;
-  color: #321044;
+  resize: vertical;
 }
 
-.small {
-  font-size: 12px;
-  opacity: 0.85;
-}
-
-#message {
-  min-height: 28px;
-  font-weight: bold;
-}
-
-.hidden {
-  display: none !important;
-}
-
-footer {
-  margin-top: 25px;
-  font-size: 12px;
-  opacity: 0.7;
-}
+.small { font-size: 13px; opacity: .8; }
 </style>
 </head>
 
 <body>
 <main class="card">
-
-  <section id="quiz">
-    <p id="progress">QUESTION 1 OF 5</p>
-    <h1 id="question"></h1>
-    <p id="description"></p>
-    <div id="content"></div>
-    <p id="message" aria-live="polite"></p>
-  </section>
-
-  <section id="ending" class="hidden">
-    <h1>Thank u for ur time 💜</h1>
-    <p>U officially survived my little quiz 😂</p>
-    <p>Hope I made u smile!</p>
-    <div class="buttons">
-      <button class="primary" id="restartBtn">Take it again 🔄</button>
-    </div>
-  </section>
-
-  <footer>Made with 💜 and a little mischief</footer>
+  <div id="quiz"></div>
 </main>
 
 <script>
-const $ = id => document.getElementById(id);
+const quiz = document.getElementById("quiz");
+let currentQuestion = 1;
 
-function showQuestion(number, title, description = "") {
-  $("progress").textContent = `QUESTION ${number} OF 5`;
-  $("question").textContent = title;
-  $("description").textContent = description;
-  $("content").replaceChildren();
-  $("message").textContent = "";
+function showQuestion(title, content) {
+  quiz.innerHTML = `<h1>${title}</h1>${content}`;
 }
 
-function makeButton(label, action, primary = false) {
-  const b = document.createElement("button");
-  b.textContent = label;
-
-  if (primary) {
-    b.className = "primary";
-  }
-
-  b.addEventListener("click", action);
-  return b;
+function question1() {
+  currentQuestion = 1;
+  showQuestion("Are u male or female? 💜", `
+    <button class="choice" onclick="question2('Male')">Male</button>
+    <button class="choice" onclick="question2('Female')">Female</button>
+  `);
 }
 
-/* QUESTION 1 */
-function genderQuestion() {
-  showQuestion(
-    1,
-    "Are u male or female? 👀",
-    "Choose wisely 😂"
-  );
+function question2(answer) {
+  currentQuestion = 2;
+  showQuestion("Are u tall or short? 👀", `
+    <p>Choose carefully 😂</p>
+    <div id="playArea">
+      <button class="choice dodge" id="tall">Tall</button>
+      <button class="choice dodge" id="short">Short</button>
+    </div>
+  `);
 
-  const row = document.createElement("div");
-  row.className = "buttons";
-
-  row.append(
-    makeButton("Male 🙋‍♂️", heightQuestion),
-    makeButton("Female 🙋‍♀️", heightQuestion)
-  );
-
-  $("content").append(row);
-}
-
-/* QUESTION 2: TALL DISAPPEARS, SHORT STAYS */
-function heightQuestion() {
-  showQuestion(
-    2,
-    "Are u tall or short? 📏",
-    "Try catching your answer 😭"
-  );
-
-  const area = document.createElement("div");
-  area.id = "heightArea";
-
-  const tall = makeButton("Tall 📏", () => {});
-  const short = makeButton("Short 🤏", heightChosen);
-
-  tall.id = "tallBtn";
-  short.id = "shortBtn";
-
-  area.append(tall, short);
-  $("content").append(area);
-
+  const area = document.getElementById("playArea");
+  const tall = document.getElementById("tall");
+  const short = document.getElementById("short");
   let dodges = 0;
   let lastDodge = 0;
 
-  function dodgeTall(event) {
-    if (tall.dataset.gone === "yes") return;
-
-    // Prevent repeated touch events from counting twice.
-    const now = Date.now();
-    if (now - lastDodge < 250) return;
-    lastDodge = now;
-
-    dodges++;
-
-    if (dodges >= 3) {
-      tall.dataset.gone = "yes";
-      tall.remove();
-
-      $("message").textContent =
-        "TALL HAS LEFT THE CHAT 💀😂";
-
-      return;
-    }
-
-    const maxX = Math.max(0, area.clientWidth - tall.offsetWidth);
-    const maxY = Math.max(0, area.clientHeight - tall.offsetHeight);
-
-    tall.style.left = Math.random() * maxX + "px";
-    tall.style.top = Math.random() * maxY + "px";
+  function place(button, x, y) {
+    button.style.transform = "none";
+    button.style.left = x + "px";
+    button.style.top = y + "px";
   }
 
-  // Computer: move when the mouse approaches.
-  tall.addEventListener("pointerenter", event => {
-    if (event.pointerType === "mouse") {
-      dodgeTall(event);
-    }
-  });
-
-  // Phone/tablet: move when someone tries to tap Tall.
-  tall.addEventListener("pointerdown", event => {
-    if (event.pointerType === "touch") {
-      event.preventDefault();
-      dodgeTall(event);
-    }
-  });
-
-  const hint = document.createElement("p");
-  hint.className = "small";
-  hint.textContent = "Go on, try choosing Tall 😂";
-  $("content").append(hint);
-}
-
-function heightChosen() {
-  showQuestion(
-    2,
-    "Interesting choice... 🤨",
-    "I totally won't judge u. Probably."
-  );
-
-  $("content").append(
-    makeButton("Continue ➜", loveQuestion, true)
-  );
-}
-
-/* QUESTION 3: YES AND NO CAN DODGE */
-function loveQuestion() {
-  showQuestion(
-    3,
-    "Do u love me? 🥹",
-    "Both answers are acting suspicious 💀"
-  );
-
-  const area = document.createElement("div");
-  area.id = "loveArea";
-
-  const yes = makeButton("YES 💗", () => loveAnswer("YES"));
-  const no = makeButton("NO 💀", () => loveAnswer("NO"));
-
-  yes.id = "yesBtn";
-  no.id = "noBtn";
-
-  area.append(yes, no);
-  $("content").append(area);
-
-  setupLoveDodge(yes, area);
-  setupLoveDodge(no, area);
-}
-
-function setupLoveDodge(button, area) {
-  let dodges = 0;
-  let lastDodge = 0;
-
-  function dodge() {
-    if (button.dataset.ready === "yes") return;
-
+  function move(button) {
     const now = Date.now();
     if (now - lastDodge < 250) return;
     lastDodge = now;
-
     dodges++;
-
-    // After three dodges, let the person select the button.
-    if (dodges >= 3) {
-      button.dataset.ready = "yes";
-      $("message").textContent = "Okay, u can catch it now 😭";
-      return;
-    }
 
     const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
     const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
 
-    button.style.left = Math.random() * maxX + "px";
-    button.style.top = Math.random() * maxY + "px";
-    button.style.right = "auto";
+    place(button, Math.random() * maxX, Math.random() * maxY);
+
+    if (dodges >= 4) tall.remove();
   }
 
-  button.addEventListener("pointerenter", event => {
-    if (event.pointerType === "mouse") dodge();
-  });
+  place(tall, 35, 55);
+  place(short, Math.max(0, area.clientWidth - 105), 55);
 
-  button.addEventListener("pointerdown", event => {
-    if (
-      event.pointerType === "touch" &&
-      button.dataset.ready !== "yes"
-    ) {
-      event.preventDefault();
-      dodge();
+  tall.addEventListener("pointerenter", move);
+  tall.addEventListener("pointerdown", e => {
+    if (dodges < 4) {
+      e.preventDefault();
+      move(tall);
     }
   });
+
+  short.addEventListener("click", () => question3());
 }
 
-function loveAnswer(answer) {
-  showQuestion(
-    3,
-    answer === "YES" ? "AWWW 😭💗" : "OUCH 💀",
-    answer === "YES"
-      ? "Don't get too comfortable 😂"
-      : "Noted. I will remember this. (Maybe.)"
-  );
+function question3() {
+  currentQuestion = 3;
+  showQuestion("Do u love me? 🥹💜", `
+    <p>Try catching your answer 😂</p>
+    <div id="playArea">
+      <button class="choice dodge" id="yes">YES 💗</button>
+      <button class="choice dodge" id="no">NO 💔</button>
+    </div>
+    <p class="small">The buttons are playing hard to get 😭</p>
+  `);
 
-  $("content").append(
-    makeButton("Continue ➜", secretQuestion, true)
-  );
-}
+  const area = document.getElementById("playArea");
+  const buttons = [
+    document.getElementById("yes"),
+    document.getElementById("no")
+  ];
+  let dodges = 0;
+  let ready = false;
+  let lastMove = 0;
 
-/* QUESTION 4: THE SECRET ANSWER PRANK */
-function secretQuestion() {
-  showQuestion(
-    4,
-    "What's the thing u would say to few close people u trust? 🤫",
-    "Tell me something you'd only share with a few people."
-  );
+  function position(button, x, y) {
+    button.style.transform = "none";
+    button.style.left = x + "px";
+    button.style.top = y + "px";
+  }
 
-  const form = document.createElement("form");
+  function move(button) {
+    const now = Date.now();
+    if (now - lastMove < 250) return;
+    lastMove = now;
 
-  const answer = document.createElement("textarea");
-  answer.placeholder = "Type your answer here...";
-  answer.required = true;
-  answer.maxLength = 1000;
-  answer.setAttribute("aria-label", "Your answer");
+    dodges++;
 
-  const submit = makeButton(
-    "Submit my answer ✨",
-    () => {},
-    true
-  );
-  submit.type = "submit";
+    buttons.forEach((b, i) => {
+      const maxX = Math.max(0, area.clientWidth - b.offsetWidth);
+      const maxY = Math.max(0, area.clientHeight - b.offsetHeight);
+      position(b, Math.random() * maxX, Math.random() * maxY);
+    });
 
-  form.append(answer, submit);
+    if (dodges >= 5) {
+      ready = true;
+    }
+  }
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
+  buttons.forEach((button, i) => {
+    position(button, i === 0 ? 20 : Math.max(0, area.clientWidth - 105), 55);
 
-    showQuestion(
-      4,
-      "LMAOOOO 😭😭",
-      "Plot twist: your answer was NOT saved! 😂"
-    );
+    button.addEventListener("pointerenter", () => {
+      if (!ready) move(button);
+    });
 
-    const joke = document.createElement("p");
-    joke.textContent =
-      "U really trusted this website huh 💀";
-    $("content").append(joke);
+    button.addEventListener("pointerdown", e => {
+      if (!ready) {
+        e.preventDefault();
+        move(button);
+      }
+    });
 
-    $("content").append(
-      makeButton("Continue ➜", enjoyQuestion, true)
-    );
+    button.addEventListener("click", () => {
+      if (ready) question4();
+    });
   });
-
-  $("content").append(form);
-
-  const note = document.createElement("p");
-  note.className = "small";
-  note.textContent =
-    "Prank note: this demo does not send or store your answer.";
-  $("content").append(note);
 }
 
-/* QUESTION 5 */
-function enjoyQuestion() {
-  showQuestion(
-    5,
-    "Did u enjoy the quiz? 😂",
-    "Be honest. I can take it."
-  );
+function question4() {
+  currentQuestion = 4;
+  showQuestion("What's the thing u would say to few close people u trust? 🤫", `
+    <p>Tell me your secret... 👀</p>
+    <form id="secretForm">
+      <textarea id="secret" placeholder="Type your answer here..." required></textarea>
+      <br>
+      <button class="primary" type="submit">Submit 🤭</button>
+    </form>
+    <p class="small">Your answer isn't sent or saved by this quiz.</p>
+  `);
 
-  const row = document.createElement("div");
-  row.className = "buttons";
-
-  row.append(
-    makeButton("YES 😍", ending, true),
-    makeButton("NO 😒", ending)
-  );
-
-  $("content").append(row);
+  document.getElementById("secretForm").addEventListener("submit", e => {
+    e.preventDefault();
+    showQuestion("PLOT TWIST 😂", `
+      <p>Your answer was NOT saved! 😭💀</p>
+      <p>Don't worry, your secret is safe 💜</p>
+      <button class="primary" onclick="question5()">Continue ➜</button>
+    `);
+  });
 }
 
-/* FINAL SCREEN */
+function question5() {
+  currentQuestion = 5;
+  showQuestion("Did u enjoy the quiz? 🥹", `
+    <button class="choice" onclick="ending()">YES 💜</button>
+    <button class="choice" onclick="ending()">NO 😭</button>
+  `);
+}
+
 function ending() {
-  $("quiz").classList.add("hidden");
-  $("ending").classList.remove("hidden");
+  showQuestion("Thank u for ur time 💜", `
+    <p>U officially survived my little quiz 😂</p>
+    <p>Hope I made u smile! 🫶</p>
+    <button class="primary" onclick="question1()">Play Again 🔄</button>
+  `);
 }
 
-function restartQuiz() {
-  $("ending").classList.add("hidden");
-  $("quiz").classList.remove("hidden");
-  genderQuestion();
-}
-
-$("restartBtn").addEventListener("click", restartQuiz);
-
-genderQuestion();
+question1();
 </script>
 </body>
 </html>
