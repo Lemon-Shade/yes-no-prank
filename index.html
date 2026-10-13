@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Little Quiz 💜</title>
+<title>Riri's Trail 💜</title>
 
 <style>
 * {
@@ -113,7 +113,7 @@ function showQuestion(title, content) {
 /* QUESTION 1 */
 function question1() {
   showQuestion("Are u male or female? 💜", `
-    <p>Let's get to know u 👀</p>
+    <p>Of course ur a female, right? 👀</p>
     <button class="choice" onclick="question2()">Male</button>
     <button class="choice" onclick="question2()">Female</button>
   `);
@@ -122,7 +122,7 @@ function question1() {
 /* QUESTION 2: TALL BUTTON DODGES */
 function question2() {
   showQuestion("Are u tall or short? 😂", `
-    <p>Try choosing Tall... I dare u 😭</p>
+    <p>Try choosing Tall... I dare u 🤣🤣</p>
     <div id="playArea">
       <button class="choice dodge" id="tall">Tall</button>
       <button class="choice dodge" id="short">Short</button>
@@ -183,8 +183,8 @@ function question2() {
 
 /* QUESTION 3: YES AND NO BOTH DODGE */
 function question3() {
-  showQuestion("Do u love me? 🥹💜", `
-    <p>Catch an answer if u can 😂</p>
+  showQuestion("Do u love me? 😋😋", `
+    <p>Catch the answer if u can 😂</p>
     <div id="playArea">
       <button class="choice dodge" id="yes">YES 💗</button>
       <button class="choice dodge" id="no">NO 💔</button>
@@ -234,7 +234,7 @@ function question3() {
 
     if (dodges >= 5) {
       ready = true;
-      hint.textContent = "Okay fine 😭 Choose your answer!";
+      hint.textContent = "Okay okay fine 🤣🤣 Choose your answer!";
     }
   }
 
@@ -265,15 +265,15 @@ function question4() {
       <br>
       <button class="primary" type="submit">Submit 🤭</button>
     </form>
-    <p class="small">Your answer isn't sent or saved by this quiz.</p>
+    <p class="small">Your answer isn't sent or saved by this quiz btw.</p>
   `);
 
   document.getElementById("secretForm").addEventListener("submit", event => {
     event.preventDefault();
 
-    showQuestion("PLOT TWIST 😂💀", `
+    showQuestion("Ayooo chill 😂💀", `
       <p>Your answer was NOT saved! 😭</p>
-      <p>Your secret is safe with... absolutely nobody. JK 😂💜</p>
+      <p>But u can screenshot and send it tho... 👀😂💜</p>
       <button class="primary" onclick="question5()">Continue ➜</button>
     `);
   });
@@ -281,17 +281,17 @@ function question4() {
 
 /* QUESTION 5 */
 function question5() {
-  showQuestion("Did u enjoy the quiz? 🥹", `
+  showQuestion("Did u enjoy the quiz? 🦚", `
     <button class="choice" onclick="ending()">YES 💜</button>
-    <button class="choice" onclick="ending()">NO 😭</button>
+    <button class="choice" onclick="ending()">NO 🥱😎</button>
   `);
 }
 
 /* FINAL SCREEN */
 function ending() {
-  showQuestion("Thank u for ur time 💜", `
-    <p>U officially survived my little quiz 😂</p>
-    <p>Hope I made u smile! 🫶</p>
+  showQuestion("Well regardless, ur my Shortcake and always will😊 💜", `
+    <p>U live for another day 😂</p>
+    <p>Ooooh i love u soo much 😘😋😚</p>
     <button class="primary" onclick="question1()">Play Again 🔄</button>
   `);
 }
