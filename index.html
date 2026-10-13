@@ -2,283 +2,475 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A Question for You 💜</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Quiz 💜</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
   font-family: Arial, sans-serif;
   color: white;
-  background: linear-gradient(135deg, #180b2e, #54218a, #b35cff);
+  background: linear-gradient(135deg, #250044, #7415a8, #d16aff);
 }
 
 .card {
-  width: min(100%, 430px);
+  width: 100%;
+  max-width: 460px;
+  min-height: 350px;
   padding: 30px 22px;
   text-align: center;
-  border: 1px solid #ffffff45;
+  background: rgba(35, 0, 55, 0.88);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 25px;
-  background: #ffffff16;
-  box-shadow: 0 15px 50px #0005;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+  overflow: hidden;
 }
 
-.heart { font-size: 48px; }
+h1 {
+  font-size: 27px;
+  line-height: 1.3;
+}
 
-h1 { font-size: 27px; }
-
-p { line-height: 1.6; color: #f0ddff; }
+p {
+  line-height: 1.6;
+  color: #f0d9ff;
+}
 
 .buttons {
-  position: relative;
-  min-height: 115px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
   margin-top: 25px;
+  min-height: 65px;
 }
 
 button {
-  border: 0;
-  border-radius: 30px;
+  border: none;
+  border-radius: 14px;
   padding: 14px 22px;
-  margin: 5px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  touch-action: manipulation;
-}
-
-.choice {
+  color: #4b1268;
   background: white;
-  color: #54218a;
+  touch-action: manipulation;
+  user-select: none;
 }
 
-.secondary {
-  background: #9b55d4;
-  color: white;
+button:hover {
+  background: #f4dcff;
 }
 
-#musicButton {
-  background: #ffffff20;
-  color: white;
-  border: 1px solid #ffffff70;
-  font-size: 13px;
+button:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #ffdc67;
+  outline-offset: 3px;
 }
 
-#feedback {
-  min-height: 50px;
-  font-weight: bold;
-  font-size: 18px;
+.primary {
+  background: #e6a6ff;
+  color: #35004d;
 }
 
-.hidden { display: none !important; }
+#heightArea {
+  position: relative;
+  min-height: 120px;
+  margin-top: 20px;
+}
 
-#yes, #no {
+#heightArea button {
   position: absolute;
-  transition: left .18s, top .18s, opacity .35s, transform .18s;
+  top: 20px;
 }
 
-#yes { left: 8%; top: 12px; }
-#no { right: 8%; top: 12px; }
+#tallBtn {
+  left: 12%;
+}
 
-.vanished {
-  opacity: 0;
-  pointer-events: none;
+#shortBtn {
+  right: 12%;
+}
+
+#loveArea {
+  position: relative;
+  height: 150px;
+  margin-top: 20px;
+}
+
+#loveArea button {
+  position: absolute;
+  top: 35px;
+  transition: left 0.12s, top 0.12s;
+}
+
+#yesBtn {
+  left: 10%;
+}
+
+#noBtn {
+  left: 58%;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 13px;
+  margin: 14px 0;
+  border: 2px solid #dca6f5;
+  border-radius: 12px;
+  font: inherit;
+  color: #321044;
 }
 
 .small {
   font-size: 12px;
-  opacity: .8;
+  opacity: 0.85;
+}
+
+#message {
+  min-height: 28px;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none !important;
+}
+
+footer {
+  margin-top: 25px;
+  font-size: 12px;
+  opacity: 0.7;
 }
 </style>
 </head>
 
 <body>
 <main class="card">
-  <div class="heart">💜</div>
 
-  <button id="musicButton">♫ Turn music on</button>
-  <audio id="music" src="music.mp3" loop preload="none"></audio>
+  <section id="quiz">
+    <p id="progress">QUESTION 1 OF 5</p>
+    <h1 id="question"></h1>
+    <p id="description"></p>
+    <div id="content"></div>
+    <p id="message" aria-live="polite"></p>
+  </section>
 
-  <p id="progress">QUESTION 1 OF 3</p>
-  <h1 id="heading">Are you male or female?</h1>
-  <p id="description">Let's get to know you first 👀</p>
+  <section id="ending" class="hidden">
+    <h1>Thank u for ur time 💜</h1>
+    <p>U officially survived my little quiz 😂</p>
+    <p>Hope I made u smile!</p>
+    <div class="buttons">
+      <button class="primary" id="restartBtn">Take it again 🔄</button>
+    </div>
+  </section>
 
-  <div id="genderChoices">
-    <button class="choice" data-gender="male">Male 🙋‍♂️</button>
-    <button class="choice" data-gender="female">Female 🙋‍♀️</button>
-  </div>
-
-  <div id="heightChoices" class="hidden">
-    <button class="choice" data-height="tall">Tall 📏</button>
-    <button class="choice" data-height="short">Short 🤏</button>
-  </div>
-
-  <div id="loveChoices" class="hidden buttons">
-    <button id="yes" class="choice">YES 💖</button>
-    <button id="no" class="secondary">NO 😈</button>
-  </div>
-
-  <p id="feedback" aria-live="polite"></p>
-  <button id="next" class="secondary hidden">Continue ➜</button>
-  <button id="restart" class="secondary hidden">Start again ↻</button>
-
-  <p class="small">Made with 💜 and questionable intentions.</p>
+  <footer>Made with 💜 and a little mischief</footer>
 </main>
 
 <script>
-const heading = document.getElementById("heading");
-const description = document.getElementById("description");
-const progress = document.getElementById("progress");
-const feedback = document.getElementById("feedback");
-const genderChoices = document.getElementById("genderChoices");
-const heightChoices = document.getElementById("heightChoices");
-const loveChoices = document.getElementById("loveChoices");
-const yes = document.getElementById("yes");
-const no = document.getElementById("no");
-const next = document.getElementById("next");
-const restart = document.getElementById("restart");
-const music = document.getElementById("music");
-const musicButton = document.getElementById("musicButton");
+const $ = id => document.getElementById(id);
 
-let stage = 1;
-let attempts = 0;
-let musicOn = false;
+function showQuestion(number, title, description = "") {
+  $("progress").textContent = `QUESTION ${number} OF 5`;
+  $("question").textContent = title;
+  $("description").textContent = description;
+  $("content").replaceChildren();
+  $("message").textContent = "";
+}
 
-function showStage(number) {
-  stage = number;
-  feedback.textContent = "";
-  next.classList.add("hidden");
-  genderChoices.classList.add("hidden");
-  heightChoices.classList.add("hidden");
-  loveChoices.classList.add("hidden");
-  restart.classList.add("hidden");
+function makeButton(label, action, primary = false) {
+  const b = document.createElement("button");
+  b.textContent = label;
 
-  if (number === 1) {
-    progress.textContent = "QUESTION 1 OF 3";
-    heading.textContent = "Are you male or female?";
-    description.textContent = "Let's get to know you first 👀";
-    genderChoices.classList.remove("hidden");
+  if (primary) {
+    b.className = "primary";
   }
 
-  if (number === 2) {
-    progress.textContent = "QUESTION 2 OF 3";
-    heading.textContent = "Are you tall or short?";
-    description.textContent = "Be honest... 😂";
-    heightChoices.classList.remove("hidden");
-  }
-
-  if (number === 3) {
-    progress.textContent = "QUESTION 3 OF 3";
-    heading.textContent = "Do you love me? 🥹💜";
-    description.textContent = "Choose carefully. There are consequences.";
-    loveChoices.classList.remove("hidden");
-    resetButtons();
-  }
+  b.addEventListener("click", action);
+  return b;
 }
 
-document.querySelectorAll("[data-gender]").forEach(button => {
-  button.addEventListener("click", () => {
-    feedback.textContent = button.dataset.gender === "male"
-      ? "A gentleman, huh? 👀"
-      : "A queen has entered the chat 👑";
-    next.classList.remove("hidden");
-  });
-});
+/* QUESTION 1 */
+function genderQuestion() {
+  showQuestion(
+    1,
+    "Are u male or female? 👀",
+    "Choose wisely 😂"
+  );
 
-document.querySelectorAll("[data-height]").forEach(button => {
-  button.addEventListener("click", () => {
-    feedback.textContent = button.dataset.height === "tall"
-      ? "Tall? Your confidence is taller than you 😂"
-      : "Short? Don't worry, the attitude adds 10 cm 💀";
-    heightChoices.classList.add("hidden");
-    next.classList.remove("hidden");
-  });
-});
+  const row = document.createElement("div");
+  row.className = "buttons";
 
-next.addEventListener("click", () => {
-  if (stage === 1) showStage(2);
-  else if (stage === 2) showStage(3);
-});
+  row.append(
+    makeButton("Male 🙋‍♂️", heightQuestion),
+    makeButton("Female 🙋‍♀️", heightQuestion)
+  );
 
-function moveButton(button) {
-  const area = loveChoices;
-  const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
-  const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
-
-  button.style.left = Math.random() * maxX + "px";
-  button.style.top = Math.random() * maxY + "px";
+  $("content").append(row);
 }
 
-function resetButtons() {
-  attempts = 0;
-  [yes, no].forEach(button => {
-    button.classList.remove("vanished");
-    button.style.transform = "scale(1)";
-    button.style.left = "";
-    button.style.top = "";
-    button.style.right = "";
-  });
-  yes.style.left = "8%";
-  yes.style.top = "12px";
-  no.style.right = "8%";
-  no.style.top = "12px";
-}
+/* QUESTION 2: TALL DISAPPEARS, SHORT STAYS */
+function heightQuestion() {
+  showQuestion(
+    2,
+    "Are u tall or short? 📏",
+    "Try catching your answer 😭"
+  );
 
-function dodge(button) {
-  attempts++;
-  moveButton(button);
-  button.style.transform = `scale(${Math.max(.45, 1 - attempts * .09)})`;
+  const area = document.createElement("div");
+  area.id = "heightArea";
 
-  feedback.textContent = attempts < 4
-    ? "HAHAHA! Catch me first 😂"
-    : "Your answer has been rejected 💀";
+  const tall = makeButton("Tall 📏", () => {});
+  const short = makeButton("Short 🤏", heightChosen);
 
-  if (attempts >= 7) {
-    button.classList.add("vanished");
-    feedback.textContent = button === no
-      ? "NO has left the chat. Interesting... 👀💜"
-      : "YES is too shy to answer 😭";
-  }
-}
+  tall.id = "tallBtn";
+  short.id = "shortBtn";
 
-yes.addEventListener("pointerenter", event => {
-  if (event.pointerType === "mouse") dodge(yes);
-});
-no.addEventListener("pointerenter", event => {
-  if (event.pointerType === "mouse") dodge(no);
-});
+  area.append(tall, short);
+  $("content").append(area);
 
-yes.addEventListener("click", () => dodge(yes));
-no.addEventListener("click", () => dodge(no));
+  let dodges = 0;
+  let lastDodge = 0;
 
-function startOver() {
-  showStage(1);
-}
-restart.addEventListener("click", startOver);
+  function dodgeTall(event) {
+    if (tall.dataset.gone === "yes") return;
 
-musicButton.addEventListener("click", async () => {
-  if (musicOn) {
-    music.pause();
-    musicOn = false;
-    musicButton.textContent = "♫ Turn music on";
-  } else {
-    try {
-      await music.play();
-      musicOn = true;
-      musicButton.textContent = "♫ Turn music off";
-    } catch {
-      musicButton.textContent = "Add music.mp3 first 🎵";
+    // Prevent repeated touch events from counting twice.
+    const now = Date.now();
+    if (now - lastDodge < 250) return;
+    lastDodge = now;
+
+    dodges++;
+
+    if (dodges >= 3) {
+      tall.dataset.gone = "yes";
+      tall.remove();
+
+      $("message").textContent =
+        "TALL HAS LEFT THE CHAT 💀😂";
+
+      return;
     }
-  }
-});
 
-showStage(1);
+    const maxX = Math.max(0, area.clientWidth - tall.offsetWidth);
+    const maxY = Math.max(0, area.clientHeight - tall.offsetHeight);
+
+    tall.style.left = Math.random() * maxX + "px";
+    tall.style.top = Math.random() * maxY + "px";
+  }
+
+  // Computer: move when the mouse approaches.
+  tall.addEventListener("pointerenter", event => {
+    if (event.pointerType === "mouse") {
+      dodgeTall(event);
+    }
+  });
+
+  // Phone/tablet: move when someone tries to tap Tall.
+  tall.addEventListener("pointerdown", event => {
+    if (event.pointerType === "touch") {
+      event.preventDefault();
+      dodgeTall(event);
+    }
+  });
+
+  const hint = document.createElement("p");
+  hint.className = "small";
+  hint.textContent = "Go on, try choosing Tall 😂";
+  $("content").append(hint);
+}
+
+function heightChosen() {
+  showQuestion(
+    2,
+    "Interesting choice... 🤨",
+    "I totally won't judge u. Probably."
+  );
+
+  $("content").append(
+    makeButton("Continue ➜", loveQuestion, true)
+  );
+}
+
+/* QUESTION 3: YES AND NO CAN DODGE */
+function loveQuestion() {
+  showQuestion(
+    3,
+    "Do u love me? 🥹",
+    "Both answers are acting suspicious 💀"
+  );
+
+  const area = document.createElement("div");
+  area.id = "loveArea";
+
+  const yes = makeButton("YES 💗", () => loveAnswer("YES"));
+  const no = makeButton("NO 💀", () => loveAnswer("NO"));
+
+  yes.id = "yesBtn";
+  no.id = "noBtn";
+
+  area.append(yes, no);
+  $("content").append(area);
+
+  setupLoveDodge(yes, area);
+  setupLoveDodge(no, area);
+}
+
+function setupLoveDodge(button, area) {
+  let dodges = 0;
+  let lastDodge = 0;
+
+  function dodge() {
+    if (button.dataset.ready === "yes") return;
+
+    const now = Date.now();
+    if (now - lastDodge < 250) return;
+    lastDodge = now;
+
+    dodges++;
+
+    // After three dodges, let the person select the button.
+    if (dodges >= 3) {
+      button.dataset.ready = "yes";
+      $("message").textContent = "Okay, u can catch it now 😭";
+      return;
+    }
+
+    const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
+    const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
+
+    button.style.left = Math.random() * maxX + "px";
+    button.style.top = Math.random() * maxY + "px";
+    button.style.right = "auto";
+  }
+
+  button.addEventListener("pointerenter", event => {
+    if (event.pointerType === "mouse") dodge();
+  });
+
+  button.addEventListener("pointerdown", event => {
+    if (
+      event.pointerType === "touch" &&
+      button.dataset.ready !== "yes"
+    ) {
+      event.preventDefault();
+      dodge();
+    }
+  });
+}
+
+function loveAnswer(answer) {
+  showQuestion(
+    3,
+    answer === "YES" ? "AWWW 😭💗" : "OUCH 💀",
+    answer === "YES"
+      ? "Don't get too comfortable 😂"
+      : "Noted. I will remember this. (Maybe.)"
+  );
+
+  $("content").append(
+    makeButton("Continue ➜", secretQuestion, true)
+  );
+}
+
+/* QUESTION 4: THE SECRET ANSWER PRANK */
+function secretQuestion() {
+  showQuestion(
+    4,
+    "What's the thing u would say to few close people u trust? 🤫",
+    "Tell me something you'd only share with a few people."
+  );
+
+  const form = document.createElement("form");
+
+  const answer = document.createElement("textarea");
+  answer.placeholder = "Type your answer here...";
+  answer.required = true;
+  answer.maxLength = 1000;
+  answer.setAttribute("aria-label", "Your answer");
+
+  const submit = makeButton(
+    "Submit my answer ✨",
+    () => {},
+    true
+  );
+  submit.type = "submit";
+
+  form.append(answer, submit);
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+
+    showQuestion(
+      4,
+      "LMAOOOO 😭😭",
+      "Plot twist: your answer was NOT saved! 😂"
+    );
+
+    const joke = document.createElement("p");
+    joke.textContent =
+      "U really trusted this website huh 💀";
+    $("content").append(joke);
+
+    $("content").append(
+      makeButton("Continue ➜", enjoyQuestion, true)
+    );
+  });
+
+  $("content").append(form);
+
+  const note = document.createElement("p");
+  note.className = "small";
+  note.textContent =
+    "Prank note: this demo does not send or store your answer.";
+  $("content").append(note);
+}
+
+/* QUESTION 5 */
+function enjoyQuestion() {
+  showQuestion(
+    5,
+    "Did u enjoy the quiz? 😂",
+    "Be honest. I can take it."
+  );
+
+  const row = document.createElement("div");
+  row.className = "buttons";
+
+  row.append(
+    makeButton("YES 😍", ending, true),
+    makeButton("NO 😒", ending)
+  );
+
+  $("content").append(row);
+}
+
+/* FINAL SCREEN */
+function ending() {
+  $("quiz").classList.add("hidden");
+  $("ending").classList.remove("hidden");
+}
+
+function restartQuiz() {
+  $("ending").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  genderQuestion();
+}
+
+$("restartBtn").addEventListener("click", restartQuiz);
+
+genderQuestion();
 </script>
 </body>
 </html>
