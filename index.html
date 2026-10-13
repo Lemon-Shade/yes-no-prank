@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Little Quiz 💜</title>
+<title>A Little Quiz 💜</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: Arial, sans-serif;
   color: white;
   background: linear-gradient(135deg, #230046, #8126a8, #d45cba);
@@ -22,17 +24,23 @@ body {
 
 .card {
   width: 100%;
-  max-width: 430px;
+  max-width: 440px;
   padding: 28px 20px;
   text-align: center;
-  background: rgba(25, 0, 40, .65);
-  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(25, 0, 40, 0.72);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 24px;
-  box-shadow: 0 12px 35px #21002b66;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.25);
 }
 
-h1 { font-size: 27px; }
-p { line-height: 1.5; }
+h1 {
+  font-size: 27px;
+  line-height: 1.3;
+}
+
+p {
+  line-height: 1.5;
+}
 
 button {
   border: 0;
@@ -46,42 +54,47 @@ button {
 }
 
 .choice {
-  background: #f5d8ff;
   color: #4c1766;
+  background: #f5d8ff;
 }
 
 .primary {
-  background: #ff8bd8;
   color: #381044;
+  background: #ff8bd8;
 }
 
 #playArea {
   position: relative;
-  min-height: 155px;
+  height: 190px;
   margin-top: 18px;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.06);
 }
 
 .dodge {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
+  margin: 0;
+  transform: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #secret {
   width: 100%;
-  min-height: 100px;
+  min-height: 110px;
   padding: 12px;
-  border-radius: 12px;
   border: 2px solid #e8b8ff;
+  border-radius: 12px;
   font: inherit;
   resize: vertical;
 }
 
-.small { font-size: 13px; opacity: .8; }
+.small {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
 </style>
 </head>
 
@@ -92,24 +105,24 @@ button {
 
 <script>
 const quiz = document.getElementById("quiz");
-let currentQuestion = 1;
 
 function showQuestion(title, content) {
   quiz.innerHTML = `<h1>${title}</h1>${content}`;
 }
 
+/* QUESTION 1 */
 function question1() {
-  currentQuestion = 1;
   showQuestion("Are u male or female? 💜", `
-    <button class="choice" onclick="question2('Male')">Male</button>
-    <button class="choice" onclick="question2('Female')">Female</button>
+    <p>Let's get to know u 👀</p>
+    <button class="choice" onclick="question2()">Male</button>
+    <button class="choice" onclick="question2()">Female</button>
   `);
 }
 
-function question2(answer) {
-  currentQuestion = 2;
-  showQuestion("Are u tall or short? 👀", `
-    <p>Choose carefully 😂</p>
+/* QUESTION 2: TALL BUTTON DODGES */
+function question2() {
+  showQuestion("Are u tall or short? 😂", `
+    <p>Try choosing Tall... I dare u 😭</p>
     <div id="playArea">
       <button class="choice dodge" id="tall">Tall</button>
       <button class="choice dodge" id="short">Short</button>
@@ -119,99 +132,122 @@ function question2(answer) {
   const area = document.getElementById("playArea");
   const tall = document.getElementById("tall");
   const short = document.getElementById("short");
+
   let dodges = 0;
-  let lastDodge = 0;
+  let lastMove = 0;
 
   function place(button, x, y) {
-    button.style.transform = "none";
-    button.style.left = x + "px";
-    button.style.top = y + "px";
-  }
-
-  function move(button) {
-    const now = Date.now();
-    if (now - lastDodge < 250) return;
-    lastDodge = now;
-    dodges++;
-
     const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
     const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
 
-    place(button, Math.random() * maxX, Math.random() * maxY);
-
-    if (dodges >= 4) tall.remove();
+    button.style.left = Math.max(0, Math.min(x, maxX)) + "px";
+    button.style.top = Math.max(0, Math.min(y, maxY)) + "px";
   }
 
-  place(tall, 35, 55);
-  place(short, Math.max(0, area.clientWidth - 105), 55);
+  function moveTall(event) {
+    if (dodges >= 4) return;
 
-  tall.addEventListener("pointerenter", move);
-  tall.addEventListener("pointerdown", e => {
-    if (dodges < 4) {
-      e.preventDefault();
-      move(tall);
-    }
-  });
+    if (event) event.preventDefault();
 
-  short.addEventListener("click", () => question3());
-}
-
-function question3() {
-  currentQuestion = 3;
-  showQuestion("Do u love me? 🥹💜", `
-    <p>Try catching your answer 😂</p>
-    <div id="playArea">
-      <button class="choice dodge" id="yes">YES 💗</button>
-      <button class="choice dodge" id="no">NO 💔</button>
-    </div>
-    <p class="small">The buttons are playing hard to get 😭</p>
-  `);
-
-  const area = document.getElementById("playArea");
-  const buttons = [
-    document.getElementById("yes"),
-    document.getElementById("no")
-  ];
-  let dodges = 0;
-  let ready = false;
-  let lastMove = 0;
-
-  function position(button, x, y) {
-    button.style.transform = "none";
-    button.style.left = x + "px";
-    button.style.top = y + "px";
-  }
-
-  function move(button) {
     const now = Date.now();
-    if (now - lastMove < 250) return;
+    if (now - lastMove < 180) return;
     lastMove = now;
 
     dodges++;
 
-    buttons.forEach((b, i) => {
-      const maxX = Math.max(0, area.clientWidth - b.offsetWidth);
-      const maxY = Math.max(0, area.clientHeight - b.offsetHeight);
-      position(b, Math.random() * maxX, Math.random() * maxY);
+    const maxX = Math.max(0, area.clientWidth - tall.offsetWidth);
+    const maxY = Math.max(0, area.clientHeight - tall.offsetHeight);
+
+    place(
+      tall,
+      Math.random() * maxX,
+      Math.random() * maxY
+    );
+
+    if (dodges >= 4) {
+      tall.remove();
+    }
+  }
+
+  place(tall, 15, 20);
+  place(short, Math.max(0, area.clientWidth - short.offsetWidth - 15), 115);
+
+  /* PC mouse */
+  tall.addEventListener("pointerenter", moveTall);
+
+  /* Phone touch and mouse click */
+  tall.addEventListener("pointerdown", moveTall);
+
+  short.addEventListener("click", question3);
+}
+
+/* QUESTION 3: YES AND NO BOTH DODGE */
+function question3() {
+  showQuestion("Do u love me? 🥹💜", `
+    <p>Catch an answer if u can 😂</p>
+    <div id="playArea">
+      <button class="choice dodge" id="yes">YES 💗</button>
+      <button class="choice dodge" id="no">NO 💔</button>
+    </div>
+    <p class="small" id="loveHint">These buttons are shy 😭</p>
+  `);
+
+  const area = document.getElementById("playArea");
+  const yes = document.getElementById("yes");
+  const no = document.getElementById("no");
+  const hint = document.getElementById("loveHint");
+
+  const buttons = [yes, no];
+  let dodges = 0;
+  let ready = false;
+  let lastMove = 0;
+
+  function place(button, x, y) {
+    const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
+    const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
+
+    button.style.left = Math.max(0, Math.min(x, maxX)) + "px";
+    button.style.top = Math.max(0, Math.min(y, maxY)) + "px";
+  }
+
+  function moveButtons(event) {
+    if (ready) return;
+
+    if (event) event.preventDefault();
+
+    const now = Date.now();
+    if (now - lastMove < 180) return;
+    lastMove = now;
+
+    dodges++;
+
+    buttons.forEach(button => {
+      const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
+      const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
+
+      place(
+        button,
+        Math.random() * maxX,
+        Math.random() * maxY
+      );
     });
 
     if (dodges >= 5) {
       ready = true;
+      hint.textContent = "Okay fine 😭 Choose your answer!";
     }
   }
 
-  buttons.forEach((button, i) => {
-    position(button, i === 0 ? 20 : Math.max(0, area.clientWidth - 105), 55);
+  place(yes, 15, 65);
+  place(no, Math.max(0, area.clientWidth - no.offsetWidth - 15), 65);
 
+  buttons.forEach(button => {
     button.addEventListener("pointerenter", () => {
-      if (!ready) move(button);
+      if (!ready) moveButtons();
     });
 
-    button.addEventListener("pointerdown", e => {
-      if (!ready) {
-        e.preventDefault();
-        move(button);
-      }
+    button.addEventListener("pointerdown", event => {
+      if (!ready) moveButtons(event);
     });
 
     button.addEventListener("click", () => {
@@ -220,10 +256,10 @@ function question3() {
   });
 }
 
+/* QUESTION 4: SECRET ANSWER */
 function question4() {
-  currentQuestion = 4;
   showQuestion("What's the thing u would say to few close people u trust? 🤫", `
-    <p>Tell me your secret... 👀</p>
+    <p>Come on, tell me your secret 👀</p>
     <form id="secretForm">
       <textarea id="secret" placeholder="Type your answer here..." required></textarea>
       <br>
@@ -232,24 +268,26 @@ function question4() {
     <p class="small">Your answer isn't sent or saved by this quiz.</p>
   `);
 
-  document.getElementById("secretForm").addEventListener("submit", e => {
-    e.preventDefault();
-    showQuestion("PLOT TWIST 😂", `
-      <p>Your answer was NOT saved! 😭💀</p>
-      <p>Don't worry, your secret is safe 💜</p>
+  document.getElementById("secretForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    showQuestion("PLOT TWIST 😂💀", `
+      <p>Your answer was NOT saved! 😭</p>
+      <p>Your secret is safe with... absolutely nobody. JK 😂💜</p>
       <button class="primary" onclick="question5()">Continue ➜</button>
     `);
   });
 }
 
+/* QUESTION 5 */
 function question5() {
-  currentQuestion = 5;
   showQuestion("Did u enjoy the quiz? 🥹", `
     <button class="choice" onclick="ending()">YES 💜</button>
     <button class="choice" onclick="ending()">NO 😭</button>
   `);
 }
 
+/* FINAL SCREEN */
 function ending() {
   showQuestion("Thank u for ur time 💜", `
     <p>U officially survived my little quiz 😂</p>
@@ -258,6 +296,7 @@ function ending() {
   `);
 }
 
+/* START */
 question1();
 </script>
 </body>
