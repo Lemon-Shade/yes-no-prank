@@ -2,177 +2,283 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Little Question 💜</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Question for You 💜</title>
+
 <style>
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  padding: 20px;
   font-family: Arial, sans-serif;
   color: white;
-  background: linear-gradient(135deg, #180b2e, #54218a, #a855f7);
-  overflow: hidden;
+  background: linear-gradient(135deg, #180b2e, #54218a, #b35cff);
 }
 
 .card {
-  width: min(90%, 430px);
-  padding: 35px 22px;
+  width: min(100%, 430px);
+  padding: 30px 22px;
   text-align: center;
-  border: 1px solid #ffffff40;
+  border: 1px solid #ffffff45;
   border-radius: 25px;
   background: #ffffff16;
   box-shadow: 0 15px 50px #0005;
   backdrop-filter: blur(12px);
 }
 
-.heart { font-size: 55px; }
+.heart { font-size: 48px; }
 
-h1 { font-size: 28px; margin: 15px 0; }
+h1 { font-size: 27px; }
 
-p { color: #f0ddff; line-height: 1.6; }
+p { line-height: 1.6; color: #f0ddff; }
 
 .buttons {
   position: relative;
-  min-height: 100px;
+  min-height: 115px;
   margin-top: 25px;
 }
 
 button {
   border: 0;
   border-radius: 30px;
-  padding: 14px 27px;
-  font-size: 17px;
+  padding: 14px 22px;
+  margin: 5px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   touch-action: manipulation;
 }
 
-#yes {
+.choice {
+  background: white;
   color: #54218a;
-  background: #fff;
-  transition: left .2s, top .2s, opacity .4s, transform .2s;
 }
 
-#no {
-  color: white;
+.secondary {
   background: #9b55d4;
-  border: 1px solid #ffffff70;
-  margin-left: 10px;
+  color: white;
 }
 
-#message { font-size: 22px; font-weight: bold; }
+#musicButton {
+  background: #ffffff20;
+  color: white;
+  border: 1px solid #ffffff70;
+  font-size: 13px;
+}
 
-.hidden { display: none; }
+#feedback {
+  min-height: 50px;
+  font-weight: bold;
+  font-size: 18px;
+}
 
-#yes.vanished {
+.hidden { display: none !important; }
+
+#yes, #no {
+  position: absolute;
+  transition: left .18s, top .18s, opacity .35s, transform .18s;
+}
+
+#yes { left: 8%; top: 12px; }
+#no { right: 8%; top: 12px; }
+
+.vanished {
   opacity: 0;
   pointer-events: none;
 }
+
+.small {
+  font-size: 12px;
+  opacity: .8;
+}
 </style>
 </head>
-<body>
 
+<body>
 <main class="card">
   <div class="heart">💜</div>
-  <h1 id="heading">Will you forgive me?</h1>
-  <p id="description">
-    Be honest... there's only one correct answer 😭
-  </p>
 
-  <div class="buttons" id="buttonArea">
-    <button id="yes">YES 💖</button>
-    <button id="no">NO 😈</button>
+  <button id="musicButton">♫ Turn music on</button>
+  <audio id="music" src="music.mp3" loop preload="none"></audio>
+
+  <p id="progress">QUESTION 1 OF 3</p>
+  <h1 id="heading">Are you male or female?</h1>
+  <p id="description">Let's get to know you first 👀</p>
+
+  <div id="genderChoices">
+    <button class="choice" data-gender="male">Male 🙋‍♂️</button>
+    <button class="choice" data-gender="female">Female 🙋‍♀️</button>
   </div>
 
-  <p id="message" class="hidden"></p>
-  <button id="restart" class="hidden">Try again ↻</button>
+  <div id="heightChoices" class="hidden">
+    <button class="choice" data-height="tall">Tall 📏</button>
+    <button class="choice" data-height="short">Short 🤏</button>
+  </div>
+
+  <div id="loveChoices" class="hidden buttons">
+    <button id="yes" class="choice">YES 💖</button>
+    <button id="no" class="secondary">NO 😈</button>
+  </div>
+
+  <p id="feedback" aria-live="polite"></p>
+  <button id="next" class="secondary hidden">Continue ➜</button>
+  <button id="restart" class="secondary hidden">Start again ↻</button>
+
+  <p class="small">Made with 💜 and questionable intentions.</p>
 </main>
 
 <script>
-const yes = document.getElementById("yes");
-const no = document.getElementById("no");
-const area = document.getElementById("buttonArea");
 const heading = document.getElementById("heading");
 const description = document.getElementById("description");
-const message = document.getElementById("message");
+const progress = document.getElementById("progress");
+const feedback = document.getElementById("feedback");
+const genderChoices = document.getElementById("genderChoices");
+const heightChoices = document.getElementById("heightChoices");
+const loveChoices = document.getElementById("loveChoices");
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const next = document.getElementById("next");
 const restart = document.getElementById("restart");
+const music = document.getElementById("music");
+const musicButton = document.getElementById("musicButton");
 
+let stage = 1;
 let attempts = 0;
-let moved = false;
+let musicOn = false;
 
-function dodge(event) {
-  if (event) event.preventDefault();
-  if (yes.classList.contains("vanished")) return;
+function showStage(number) {
+  stage = number;
+  feedback.textContent = "";
+  next.classList.add("hidden");
+  genderChoices.classList.add("hidden");
+  heightChoices.classList.add("hidden");
+  loveChoices.classList.add("hidden");
+  restart.classList.add("hidden");
 
-  attempts++;
-
-  if (attempts >= 7) {
-    yes.classList.add("vanished");
-    description.textContent = "Well... looks like YES has left the chat 💨";
-    return;
+  if (number === 1) {
+    progress.textContent = "QUESTION 1 OF 3";
+    heading.textContent = "Are you male or female?";
+    description.textContent = "Let's get to know you first 👀";
+    genderChoices.classList.remove("hidden");
   }
 
-  const maxX = Math.max(0, area.clientWidth - yes.offsetWidth);
-  const maxY = 65;
-
-  yes.style.position = "absolute";
-  yes.style.left = Math.random() * maxX + "px";
-  yes.style.top = Math.random() * maxY + "px";
-  yes.style.transform = "scale(" + Math.max(.45, 1 - attempts * .08) + ")";
-
-  if (!moved) {
-    no.style.position = "absolute";
-    no.style.right = "0";
-    no.style.bottom = "0";
-    moved = true;
+  if (number === 2) {
+    progress.textContent = "QUESTION 2 OF 3";
+    heading.textContent = "Are you tall or short?";
+    description.textContent = "Be honest... 😂";
+    heightChoices.classList.remove("hidden");
   }
 
-  description.textContent = [
-    "Try catching it 😂",
-    "Nope, too slow 😭",
-    "It's getting scared 💨",
-    "Almost gone... 👀",
-    "You really want YES that badly? 💀",
-    "One more try... 😂"
-  ][Math.min(attempts - 1, 5)];
+  if (number === 3) {
+    progress.textContent = "QUESTION 3 OF 3";
+    heading.textContent = "Do you love me? 🥹💜";
+    description.textContent = "Choose carefully. There are consequences.";
+    loveChoices.classList.remove("hidden");
+    resetButtons();
+  }
 }
 
-yes.addEventListener("pointerenter", function(event) {
-  if (event.pointerType === "mouse") dodge(event);
+document.querySelectorAll("[data-gender]").forEach(button => {
+  button.addEventListener("click", () => {
+    feedback.textContent = button.dataset.gender === "male"
+      ? "A gentleman, huh? 👀"
+      : "A queen has entered the chat 👑";
+    next.classList.remove("hidden");
+  });
 });
 
-yes.addEventListener("click", dodge);
-
-no.addEventListener("click", function() {
-  yes.classList.add("hidden");
-  no.classList.add("hidden");
-  heading.textContent = "YOU CHOSE NO?! 😭";
-  description.textContent = "I can't believe this...";
-  message.textContent = "PRANKED! 😂💜";
-  message.classList.remove("hidden");
-  restart.classList.remove("hidden");
+document.querySelectorAll("[data-height]").forEach(button => {
+  button.addEventListener("click", () => {
+    feedback.textContent = button.dataset.height === "tall"
+      ? "Tall? Your confidence is taller than you 😂"
+      : "Short? Don't worry, the attitude adds 10 cm 💀";
+    heightChoices.classList.add("hidden");
+    next.classList.remove("hidden");
+  });
 });
 
-restart.addEventListener("click", function() {
+next.addEventListener("click", () => {
+  if (stage === 1) showStage(2);
+  else if (stage === 2) showStage(3);
+});
+
+function moveButton(button) {
+  const area = loveChoices;
+  const maxX = Math.max(0, area.clientWidth - button.offsetWidth);
+  const maxY = Math.max(0, area.clientHeight - button.offsetHeight);
+
+  button.style.left = Math.random() * maxX + "px";
+  button.style.top = Math.random() * maxY + "px";
+}
+
+function resetButtons() {
   attempts = 0;
-  moved = false;
-  yes.className = "";
-  yes.removeAttribute("style");
-  no.className = "";
-  no.removeAttribute("style");
-  yes.classList.remove("hidden");
-  no.classList.remove("hidden");
-  message.classList.add("hidden");
-  restart.classList.add("hidden");
-  heading.textContent = "Will you forgive me?";
-  description.textContent = "Be honest... there's only one correct answer 😭";
+  [yes, no].forEach(button => {
+    button.classList.remove("vanished");
+    button.style.transform = "scale(1)";
+    button.style.left = "";
+    button.style.top = "";
+    button.style.right = "";
+  });
+  yes.style.left = "8%";
+  yes.style.top = "12px";
+  no.style.right = "8%";
+  no.style.top = "12px";
+}
+
+function dodge(button) {
+  attempts++;
+  moveButton(button);
+  button.style.transform = `scale(${Math.max(.45, 1 - attempts * .09)})`;
+
+  feedback.textContent = attempts < 4
+    ? "HAHAHA! Catch me first 😂"
+    : "Your answer has been rejected 💀";
+
+  if (attempts >= 7) {
+    button.classList.add("vanished");
+    feedback.textContent = button === no
+      ? "NO has left the chat. Interesting... 👀💜"
+      : "YES is too shy to answer 😭";
+  }
+}
+
+yes.addEventListener("pointerenter", event => {
+  if (event.pointerType === "mouse") dodge(yes);
+});
+no.addEventListener("pointerenter", event => {
+  if (event.pointerType === "mouse") dodge(no);
 });
 
+yes.addEventListener("click", () => dodge(yes));
+no.addEventListener("click", () => dodge(no));
+
+function startOver() {
+  showStage(1);
+}
+restart.addEventListener("click", startOver);
+
+musicButton.addEventListener("click", async () => {
+  if (musicOn) {
+    music.pause();
+    musicOn = false;
+    musicButton.textContent = "♫ Turn music on";
+  } else {
+    try {
+      await music.play();
+      musicOn = true;
+      musicButton.textContent = "♫ Turn music off";
+    } catch {
+      musicButton.textContent = "Add music.mp3 first 🎵";
+    }
+  }
+});
+
+showStage(1);
 </script>
 </body>
 </html>
